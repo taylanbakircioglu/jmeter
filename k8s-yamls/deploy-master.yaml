@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jmeter-master
+  labels:
+    jmeternode: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      jmeternode: master
+  template:
+    metadata:
+      labels:
+        jmeternode: master
+    spec:
+      serviceAccountName: jmeteruser
+      containers:
+      - name: jmeter-master
+        image: taylanbakircioglu/jmeter-master:latest
+        imagePullPolicy: IfNotPresent
+        command: [ "/bin/bash", "-c", "--" ]
+        args: [ "while true; do sleep 30; done;" ]
+        volumeMounts:
+          - name: script
+            mountPath: "/script"
+        ports:
+        - containerPort: 60000
+      volumes:
+      - name: script
+        configMap:
+          name: loadtest-script
+          defaultMode: 0777
